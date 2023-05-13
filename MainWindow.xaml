@@ -1,20 +1,18 @@
-﻿<Window x:Class="Project_OOP.MainWindow"
+﻿<Window x:Class="SimonSays.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Project_OOP"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Button Content="Button" Name="RedButton" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" 
-                Height="122" Width="184"/>
-        <Button Content="Button" Name="BlueButton" HorizontalAlignment="Left" Margin="216,10,0,0" VerticalAlignment="Top" 
-                Height="122" Width="184"/>
-        <Button Content="Button" Name="GreenButton" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" 
-                Height="122" Width="184"/>
-        <Button Content="Button" Name="YellowButton" HorizontalAlignment="Left" Margin="216,0,0,0" VerticalAlignment="Center" 
-                Height="122" Width="184"/>
-
-    </Grid>
+        Title="Simon Says" Height="549" Width="279">
+    <StackPanel>
+        <TextBlock Text="Simon Says" FontSize="36" FontWeight="Bold" Margin="0,20,0,20"/>
+        <StackPanel Orientation="Horizontal">
+            <Button Name="RedButton" Background="Red" Width="100" Height="100" Margin="20"/>
+            <Button Name="BlueButton" Background="Blue" Width="100" Height="100" Margin="20"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button Name="GreenButton" Background="Green" Width="100" Height="100" Margin="20"/>
+            <Button Name="YellowButton" Background="Yellow" Width="100" Height="100" Margin="20"/>
+        </StackPanel>
+        <Button Name="StartButton" Content="Start" Width="100" Height="50" Margin="0,20,0,0"/>
+        <Button Name="ResetButton" Content="Reset" Width="100" Height="50" Margin="0,20,0,0"/>
+    </StackPanel>
 </Window>
