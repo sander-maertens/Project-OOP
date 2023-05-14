@@ -12,7 +12,7 @@ using Project_OOP;
 namespace SimonSays
 {
 
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         private List<Button> simonSaysButtons;
         private List<Button> playerButtons;
@@ -22,7 +22,6 @@ namespace SimonSays
         private DispatcherTimer timer;
         private int score;
         private Leaderboard leaderboard;
-        private string playerName;
 
 
         public MainWindow()
@@ -209,39 +208,6 @@ namespace SimonSays
             }
             score = 0;
         }
-
-
-
-        private void SaveScoreToLeaderboard(int score)
-        {
-            // Bewaar de score van de speler op het leaderboard
-            Score playerScore = new Score(playerName, score);
-
-            // Laad het huidige leaderboard uit het JSON-bestand
-            string filePath = "leaderboard.json";
-            Leaderboard leaderboard = new Leaderboard();
-            if (File.Exists(filePath))
-            {
-                string json = File.ReadAllText(filePath);
-                leaderboard = JsonConvert.DeserializeObject<Leaderboard>(json);
-            }
-            else
-            {
-                leaderboard.Scores = new List<Score>();
-            }
-
-            // Voeg de score van de speler toe aan het leaderboard
-            leaderboard.Scores.Add(playerScore);
-
-            // Sorteer het leaderboard op score (aflopend) en neem de top 10 scores
-            leaderboard.Scores = leaderboard.Scores.OrderByDescending(s => s.Value).Take(10).ToList();
-
-            // Sla het bijgewerkte leaderboard op in het JSON-bestand
-            string updatedJson = JsonConvert.SerializeObject(leaderboard);
-            File.WriteAllText(filePath, updatedJson);
-        }
-
-
 
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
