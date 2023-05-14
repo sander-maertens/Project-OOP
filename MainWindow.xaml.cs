@@ -6,10 +6,12 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using System.IO;
 using System.Windows.Controls.Primitives;
-
+using Newtonsoft.Json;
+using Project_OOP;
 
 namespace SimonSays
 {
+
     public partial class MainWindow : Window
     {
         private List<Button> simonSaysButtons;
@@ -19,6 +21,7 @@ namespace SimonSays
         private Random random;
         private DispatcherTimer timer;
         private int score;
+        private Leaderboard leaderboard;
 
         public MainWindow()
         {
@@ -37,12 +40,57 @@ namespace SimonSays
             YellowButton.Click += Button_Click;
             StartButton.Click += StartButton_Click;
             ResetButton.Click += ResetButton_Click;
+            RefreshButton.Click += RefreshButton_Click;
 
             // Set up timer for Simon Says sequence playback
             timer = new DispatcherTimer();
             timer.Tick += Timer_Tick;
             timer.Interval = new TimeSpan(0, 0, 1);
+
+            // Load the current leaderboard from the JSON file
+            string filePath = "leaderboard.json";
+            leaderboard = new Leaderboard();
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+                leaderboard = JsonConvert.DeserializeObject<Leaderboard>(json);
+            }
+
+            // Bind the leaderboard data to the ListBox
+            LeaderboardListBox.ItemsSource = leaderboard.Scores;
         }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Reload the leaderboard from the JSON file and update the ListBox
+            leaderboard = new Leaderboard();
+            string filePath = "leaderboard.json";
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+                leaderboard = JsonConvert.DeserializeObject<Leaderboard>(json);
+        }
+            LeaderboardListBox.ItemsSource = leaderboard.Scores;
+        }
+
+
+        private void ShowLeaderboard()
+        {
+            // Load the current leaderboard from the JSON file
+            string filePath = "leaderboard.json";
+            Leaderboard leaderboard = new Leaderboard();
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+                leaderboard = JsonConvert.DeserializeObject<Leaderboard>(json);
+            }
+
+            // Bind the leaderboard data to the ListBox
+            LeaderboardListBox.ItemsSource = leaderboard.Scores;
+        }
+
+
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -72,6 +120,7 @@ namespace SimonSays
             if (playerButtons.Count == simonSaysSequence.Count)
             {
                 score += 10;
+                Console.WriteLine($"Score: {score}");
                 AddToSimonSaysSequence();
                 currentSequenceIndex = 0;
                 timer.Start();
@@ -119,10 +168,31 @@ namespace SimonSays
         }
         private void ResetGame()
         {
+            // Load the current leaderboard from the JSON file
+            string filePath = "leaderboard.json";
+            Leaderboard leaderboard = new Leaderboard();
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+                leaderboard = JsonConvert.DeserializeObject<Leaderboard>(json);
+            }
+            else
+            {
+                leaderboard.Scores = new List<Score>();
+            }
+
             // Save the player's score to the leaderboard if it is greater than 0
             if (score > 0)
             {
-                SaveScoreToLeaderboard(score);
+                // Add the player's score to the leaderboard
+                leaderboard.Scores.Add(new Score("Player", score));
+
+                // Sort the leaderboard by score (descending) and take the top 10 scores
+                leaderboard.Scores = leaderboard.Scores.OrderByDescending(s => s.Value).Take(10).ToList();
+
+                // Save the updated leaderboard to the JSON file
+                string updatedJson = JsonConvert.SerializeObject(leaderboard);
+                File.WriteAllText(filePath, updatedJson);
             }
 
             // Reset the game of Simon Says
@@ -135,45 +205,37 @@ namespace SimonSays
             }
             score = 0;
         }
+
+
+
         private void SaveScoreToLeaderboard(int score)
         {
-            // Save the player's score to a text file on the desktop
-            string leaderboardPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\SimonSaysLeaderboard.txt";
-            List<int> scores = new List<int>();
+            // Save the player's score to the leaderboard
+            string playerName = "Player"; // Change this to the actual player name
+            Score playerScore = new Score(playerName, score);
 
-            if (File.Exists(leaderboardPath) && new FileInfo(leaderboardPath).Length > 0)
+            // Load the current leaderboard from the JSON file
+            string filePath = "leaderboard.json";
+            Leaderboard leaderboard = new Leaderboard();
+            if (File.Exists(filePath))
             {
-                scores = File.ReadAllLines(leaderboardPath).Select(int.Parse).ToList();
+                string json = File.ReadAllText(filePath);
+                leaderboard = JsonConvert.DeserializeObject<Leaderboard>(json);
             }
-
-            scores.Add(score);
-            scores.Sort((a, b) => b.CompareTo(a));
-            if (scores.Count > 10)
+            else
             {
-                scores.RemoveAt(10);
-            }
-            File.WriteAllLines(leaderboardPath, scores.Select(x => x.ToString()).ToArray());
+                leaderboard.Scores = new List<Score>();
         }
 
+            // Add the player's score to the leaderboard
+            leaderboard.Scores.Add(playerScore);
 
-        private void AddToLeaderboard(int score)
-        {
-            // Save the player's score to a text file on the desktop
-            string leaderboardPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\SimonSaysLeaderboard.txt";
-            List<int> scores = new List<int>();
+            // Sort the leaderboard by score (descending) and take the top 10 scores
+            leaderboard.Scores = leaderboard.Scores.OrderByDescending(s => s.Value).Take(10).ToList();
 
-            if (File.Exists(leaderboardPath) && new FileInfo(leaderboardPath).Length > 0)
-            {
-                scores = File.ReadAllLines(leaderboardPath).Select(int.Parse).ToList();
-            }
-
-            scores.Add(score);
-            scores.Sort((a, b) => b.CompareTo(a));
-            if (scores.Count > 10)
-            {
-                scores.RemoveAt(10);
-            }
-            File.WriteAllLines(leaderboardPath, scores.Select(x => x.ToString()).ToArray());
+            // Save the updated leaderboard to the JSON file
+            string updatedJson = JsonConvert.SerializeObject(leaderboard);
+            File.WriteAllText(filePath, updatedJson);
         }
 
 
