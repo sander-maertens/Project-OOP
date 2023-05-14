@@ -1,18 +1,39 @@
 ﻿<Window x:Class="SimonSays.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Simon Says" Height="549" Width="279">
-    <StackPanel>
-        <TextBlock Text="Simon Says" FontSize="36" FontWeight="Bold" Margin="0,20,0,20"/>
-        <StackPanel Orientation="Horizontal">
-            <Button Name="RedButton" Background="Red" Width="100" Height="100" Margin="20"/>
-            <Button Name="BlueButton" Background="Blue" Width="100" Height="100" Margin="20"/>
+        Title="Simon Says" SizeToContent="WidthAndHeight">
+    <Grid Margin="0,0,-19,-113">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto" MinWidth="248"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Margin="0,0,0,129">
+            <TextBlock Text="Simon Says" FontSize="36" FontWeight="Bold" Margin="0,10,0,10"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Name="RedButton" Background="Red" Width="100" Height="100" Margin="20"/>
+                <Button Name="BlueButton" Background="Blue" Width="100" Height="100" Margin="20"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button Name="GreenButton" Background="Green" Width="100" Height="100" Margin="20"/>
+                <Button Name="YellowButton" Background="Yellow" Width="100" Height="100" Margin="20"/>
+            </StackPanel>
+            <Button Name="StartButton" Content="Start" Width="100" Height="50" Margin="0,20,0,0"/>
+            <Button Name="ResetButton" Content="Reset" Width="100" Height="50" Margin="0,20,0,0"/>
+            <TextBlock Text="© Sander Maertens" FontSize="18" FontWeight="SemiBold" 
+                       RenderTransformOrigin="0.506,0.641"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <Button Name="GreenButton" Background="Green" Width="100" Height="100" Margin="20"/>
-            <Button Name="YellowButton" Background="Yellow" Width="100" Height="100" Margin="20"/>
+        <StackPanel Grid.Column="1" Margin="0,0,28,10">
+            <Button Name="RefreshButton" Content="Refresh Leaderboard" Width="139" Height="50" Margin="0,20,0,0"/>
+            <ListBox Name="LeaderboardListBox" Margin="20" BorderThickness="2" BorderBrush="Black" Height="418" Width="204">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Name}" Width="100"/>
+                            <TextBlock Text="{Binding Value}" Width="50"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
-        <Button Name="StartButton" Content="Start" Width="100" Height="50" Margin="0,20,0,0"/>
-        <Button Name="ResetButton" Content="Reset" Width="100" Height="50" Margin="0,20,0,0"/>
-    </StackPanel>
+    </Grid>
 </Window>

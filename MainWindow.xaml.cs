@@ -22,18 +22,20 @@ namespace SimonSays
         private DispatcherTimer timer;
         private int score;
         private Leaderboard leaderboard;
+        private string playerName;
+
 
         public MainWindow()
         {
             InitializeComponent();
 
-            // Initialize lists of buttons and the random number generator
+            // Initialiseer lijsten met knoppen en de generator voor willekeurige getallen
             simonSaysButtons = new List<Button> { RedButton, BlueButton, GreenButton, YellowButton };
             playerButtons = new List<Button>();
             simonSaysSequence = new List<int>();
             random = new Random();
 
-            // Set up button event handlers
+            // Stel handlers voor knopgebeurtenissen in
             RedButton.Click += Button_Click;
             BlueButton.Click += Button_Click;
             GreenButton.Click += Button_Click;
@@ -42,12 +44,12 @@ namespace SimonSays
             ResetButton.Click += ResetButton_Click;
             RefreshButton.Click += RefreshButton_Click;
 
-            // Set up timer for Simon Says sequence playback
+            // Stel een timer in voor het afspelen van Simon Says-reeksen
             timer = new DispatcherTimer();
             timer.Tick += Timer_Tick;
             timer.Interval = new TimeSpan(0, 0, 1);
 
-            // Load the current leaderboard from the JSON file
+            // Laad het huidige leaderboard uit het JSON-bestand
             string filePath = "leaderboard.json";
             leaderboard = new Leaderboard();
             if (File.Exists(filePath))
@@ -56,27 +58,27 @@ namespace SimonSays
                 leaderboard = JsonConvert.DeserializeObject<Leaderboard>(json);
             }
 
-            // Bind the leaderboard data to the ListBox
+            // Bind de leaderboard-gegevens aan de ListBox
             LeaderboardListBox.ItemsSource = leaderboard.Scores;
         }
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            // Reload the leaderboard from the JSON file and update the ListBox
+            // Laad het leaderboard opnieuw vanuit het JSON-bestand en werk de ListBox bij
             leaderboard = new Leaderboard();
             string filePath = "leaderboard.json";
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
                 leaderboard = JsonConvert.DeserializeObject<Leaderboard>(json);
-        }
+            }
             LeaderboardListBox.ItemsSource = leaderboard.Scores;
         }
 
 
         private void ShowLeaderboard()
         {
-            // Load the current leaderboard from the JSON file
+            // Laad het huidige leaderboard uit het JSON-bestand
             string filePath = "leaderboard.json";
             Leaderboard leaderboard = new Leaderboard();
             if (File.Exists(filePath))
@@ -85,7 +87,7 @@ namespace SimonSays
                 leaderboard = JsonConvert.DeserializeObject<Leaderboard>(json);
             }
 
-            // Bind the leaderboard data to the ListBox
+            // Bind de leaderboard-gegevens aan de ListBox
             LeaderboardListBox.ItemsSource = leaderboard.Scores;
         }
 
@@ -94,11 +96,12 @@ namespace SimonSays
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            // Add the button that was clicked to the player's list
+            // Voeg de knop waarop is geklikt toe aan de spelerslijst
             Button button = sender as Button;
             playerButtons.Add(button);
 
-            // Check if the player's sequence matches the current Simon Says sequence
+            // Controleer of de volgorde van de speler overeenkomt met de huidige volgorde van
+            // Simon Says
             bool isCorrect = true;
             for (int i = 0; i < playerButtons.Count; i++)
             {
@@ -109,14 +112,15 @@ namespace SimonSays
                 }
             }
 
-            // If the player's sequence was incorrect, end the game
+            // Als de volgorde van de speler onjuist was, beëindigt u het spel
             if (!isCorrect)
             {
                 MessageBox.Show($"Game over! Your score is {score}");
                 ResetGame();
             }
 
-            // If the player's sequence matches the entire Simon Says sequence, add another button to the sequence and replay it
+            // Als de volgorde van de speler overeenkomt met de hele reeks van Simon Says, voegt u nog
+            // een knop toe aan de reeks en speelt u deze opnieuw af
             if (playerButtons.Count == simonSaysSequence.Count)
             {
                 score += 10;
@@ -132,14 +136,14 @@ namespace SimonSays
 
         private void AddToSimonSaysSequence()
         {
-            // Add a random button to the Simon Says sequence
+            // Voeg een willekeurige knop toe aan de Simon Says-reeks
             int buttonIndex = random.Next(0, 4);
             simonSaysSequence.Add(buttonIndex);
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            // Play back the current button in the Simon Says sequence and advance to the next button
+            // Speel de huidige knop af in de Simon Says-reeks en ga door naar de volgende knop
             simonSaysButtons[simonSaysSequence[currentSequenceIndex]].Opacity = 1;
             currentSequenceIndex++;
             if (currentSequenceIndex >= simonSaysSequence.Count)
@@ -154,7 +158,7 @@ namespace SimonSays
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            // Start a new game of Simon Says
+            // Start een nieuw spel Simon Says
             ResetGame();
             AddToSimonSaysSequence();
             currentSequenceIndex = 0;
@@ -163,12 +167,12 @@ namespace SimonSays
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            // Reset the game of Simon Says
+            // Reset het spel van Simon Says
             ResetGame();
         }
         private void ResetGame()
         {
-            // Load the current leaderboard from the JSON file
+            // Laad het huidige leaderboard uit het JSON-bestand
             string filePath = "leaderboard.json";
             Leaderboard leaderboard = new Leaderboard();
             if (File.Exists(filePath))
@@ -181,21 +185,21 @@ namespace SimonSays
                 leaderboard.Scores = new List<Score>();
             }
 
-            // Save the player's score to the leaderboard if it is greater than 0
+            // Bewaar de score van de speler op het scorebord als deze groter is dan 0
             if (score > 0)
             {
                 // Add the player's score to the leaderboard
-                leaderboard.Scores.Add(new Score("Player", score));
+                leaderboard.Scores.Add(new Score("Sander", score));
 
-                // Sort the leaderboard by score (descending) and take the top 10 scores
+                // Sorteer het leaderboard op score (aflopend) en neem de top 10 scores
                 leaderboard.Scores = leaderboard.Scores.OrderByDescending(s => s.Value).Take(10).ToList();
 
-                // Save the updated leaderboard to the JSON file
+                // Sla het bijgewerkte leaderboard op in het JSON-bestand
                 string updatedJson = JsonConvert.SerializeObject(leaderboard);
                 File.WriteAllText(filePath, updatedJson);
             }
 
-            // Reset the game of Simon Says
+            // Reset het spel van Simon Says
             simonSaysSequence.Clear();
             playerButtons.Clear();
             timer.Stop();
@@ -210,11 +214,10 @@ namespace SimonSays
 
         private void SaveScoreToLeaderboard(int score)
         {
-            // Save the player's score to the leaderboard
-            string playerName = "Player"; // Change this to the actual player name
+            // Bewaar de score van de speler op het leaderboard
             Score playerScore = new Score(playerName, score);
 
-            // Load the current leaderboard from the JSON file
+            // Laad het huidige leaderboard uit het JSON-bestand
             string filePath = "leaderboard.json";
             Leaderboard leaderboard = new Leaderboard();
             if (File.Exists(filePath))
@@ -225,15 +228,15 @@ namespace SimonSays
             else
             {
                 leaderboard.Scores = new List<Score>();
-        }
+            }
 
-            // Add the player's score to the leaderboard
+            // Voeg de score van de speler toe aan het leaderboard
             leaderboard.Scores.Add(playerScore);
 
-            // Sort the leaderboard by score (descending) and take the top 10 scores
+            // Sorteer het leaderboard op score (aflopend) en neem de top 10 scores
             leaderboard.Scores = leaderboard.Scores.OrderByDescending(s => s.Value).Take(10).ToList();
 
-            // Save the updated leaderboard to the JSON file
+            // Sla het bijgewerkte leaderboard op in het JSON-bestand
             string updatedJson = JsonConvert.SerializeObject(leaderboard);
             File.WriteAllText(filePath, updatedJson);
         }
@@ -243,7 +246,7 @@ namespace SimonSays
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // Set the opacity of all Simon Says buttons to 0.5
+            // Stel de dekking van alle Simon Says-knoppen in op 0,5
             foreach (Button button in simonSaysButtons)
             {
                 button.Opacity = 0.5;
@@ -252,7 +255,7 @@ namespace SimonSays
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            // Clean up resources when the window is closing
+            // Ruim bronnen op wanneer het venster wordt gesloten
             timer.Stop();
             timer.Tick -= Timer_Tick;
         }
